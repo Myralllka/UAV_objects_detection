@@ -1,5 +1,5 @@
 <library path="lib/libDetectionNode">
-  <class name="mrs_byci_skala_detection/DetectionNode" type="artifacts_detection::DetectionNode" base_class_type="nodelet::Nodelet">
+  <class name="artifacts_detection/DetectionNode" type="artifacts_detection::DetectionNode" base_class_type="nodelet::Nodelet">
     <description>mrs_byci_skala_detection nodelet</description>
   </class>
 </library>

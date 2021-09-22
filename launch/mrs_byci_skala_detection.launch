@@ -26,7 +26,7 @@
   <group ns="$(arg UAV_NAME)">
 
     <!-- ClASS_NAME nodelet -->
-    <node pkg="nodelet" type="nodelet" name="artifacts_detection" args="$(arg nodelet) artifacts_detection/DetectionNode $(arg nodelet_manager)" launch-prefix="$(arg launch_prefix_debug)" output="screen">
+    <node pkg="nodelet" type="nodelet" name="mrs_byci_scala_detection" args="$(arg nodelet) artifacts_detection/DetectionNode $(arg nodelet_manager)" launch-prefix="$(arg launch_prefix_debug)" output="screen">
 
       <!-- Parameters loaded from launch file -->
       <param name="gui" type="bool" value="$(arg gui)"/>
@@ -34,8 +34,7 @@
       <param name="UAV_NAME" type="string" value="$(arg UAV_NAME)"/>
 
       <!-- ROS parameters config file -->
-      <rosparam file="$(find mrs_byci_skala_detection)/config/default.yaml" />
-      <rosparam file="$(find mrs_byci_skala_detection)/config/$(arg RUN_TYPE).yaml" />
+      <rosparam file="$(find mrs_byci_skala_detection)/config/objects.yml" />
 
       <!-- Subscribers (note that the topic names will also be remapped using the namespace as a prefix) -->
 
