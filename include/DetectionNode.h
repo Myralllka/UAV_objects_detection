@@ -14,6 +14,7 @@
 #include <mrs_lib/param_loader.h>
 #include <mrs_lib/transformer.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <geometry_msgs/Point.h>
 
 #include <tf2_eigen/tf2_eigen.h>
 
@@ -34,9 +35,9 @@ namespace artifacts_detection {
         /* ros parameters */
 
         std::string m_uav_name;
-        std::vector<float> m_cube1;
-        std::vector<float> m_drill1;
-        std::vector<float> m_survivor1;
+
+        std::vector<float> m_positions;
+        std::vector<geometry_msgs::Point> m_geom_markers;
 
         // | --------------------- MRS transformer -------------------- |
 
@@ -52,13 +53,9 @@ namespace artifacts_detection {
 
         // | ----------------------- publishers ----------------------- |
 
-        ros::Publisher m_pub_marker;
-        ros::Publisher m_pub_cube1;
-        ros::Publisher m_pub_survivor1;
-        ros::Publisher m_pub_drill1;
+        ros::Publisher m_pub_cube_array;
 
         // | --------------------- other functions -------------------- |
-
     };
 //}
 

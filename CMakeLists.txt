@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   mrs_lib
   tf2_eigen
+  geometry_msgs
 )
 
 find_package(OpenCV REQUIRED)

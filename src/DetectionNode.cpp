@@ -1,6 +1,8 @@
+#include "visualization_msgs/MarkerArray.h"
 #include <DetectionNode.h>
 
 /* every nodelet must include macros which export the class as a nodelet plugin */
+#include <algorithm>
 #include <pluginlib/class_list_macros.h>
 
 namespace artifacts_detection {
@@ -20,26 +22,33 @@ namespace artifacts_detection {
 
         // | ------------------- load ros parameters ------------------ |
         /* (mrs_lib implementation checks whether the parameter was loaded or not) */
-
+        int num_of_obj;
         mrs_lib::ParamLoader pl(nh, "DetectionNode");
         pl.loadParam("UAV_NAME", m_uav_name);
-        pl.loadParam("cube1", m_cube1);
-        pl.loadParam("drill1", m_drill1);
-        pl.loadParam("survivor1", m_survivor1);
+        pl.loadParam("positions", m_positions);
+        pl.loadParam("number", num_of_obj);
 
         if (!pl.loadedSuccessfully()) {
             ROS_ERROR("[DetectionNode]: failed to load non-optional parameters!");
             ros::shutdown();
-                       }
+        }
+        // As far as 'objects' are as one-dim array, read them carefully
+        int counter = 0;
+        for(int i = 0; i < num_of_obj; ++i){
+            geometry_msgs::Point point_for_reading;
+            point_for_reading.x = m_positions[counter++];
+            point_for_reading.y = m_positions[counter++];
+            point_for_reading.z = m_positions[counter++];
+        //    std::cout << point_for_reading << std::endl;
+            m_geom_markers.push_back(std::move(point_for_reading));
+        }
 
-        m_pub_marker = nh.advertise<visualization_msgs::Marker>("visualization_marker", 1);
-        m_pub_cube1 = nh.advertise<visualization_msgs::Marker>("visualization_cube1", 1);
-        m_pub_drill1 = nh.advertise<visualization_msgs::Marker>("visualization_drill1", 1);
-        m_pub_survivor1 = nh.advertise<visualization_msgs::Marker>("visualization_survivor1", 1);
+
+        m_pub_cube_array = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 1);
 
         // | --------------------- tf transformer --------------------- |
 
-        m_transformer = mrs_lib::Transformer("DetectionNode", m_uav_name);
+        m_transformer = mrs_lib::Transformer("DetectionNode");
 
         // | -------------------- initialize timers ------------------- |
 
@@ -56,50 +65,47 @@ namespace artifacts_detection {
     void DetectionNode::tim_markers_publish([[maybe_unused]] const ros::TimerEvent &ev) {
         if (not is_initialized) return;
 
+        const auto tf_subt_ouster = m_transformer.getTransform("subt", "uav22/os_lidar", ros::Time::now());
+        
+        if (not tf_subt_ouster.has_value()) {
+            ROS_INFO_THROTTLE(1.0, "[DetectionNode] No transformation form %s to %s", "subt", "uav22/os_lidar");
+            return;
+        }
+
+        const auto transform_stamped = tf_subt_ouster.value();
+        visualization_msgs::MarkerArray marker_array;
+
         visualization_msgs::Marker marker;
-        marker.header.frame_id = "subt";
         marker.header.stamp = ros::Time();
+        marker.header.frame_id = "uav22/os_lidar";
+        //marker.header.frame_id = "subt";
         marker.ns = "mnspace";
         marker.id = 0;
-        marker.type = visualization_msgs::Marker::CUBE;
+        marker.type = visualization_msgs::Marker::CUBE_LIST;
         marker.action = visualization_msgs::Marker::ADD;
-        marker.pose.position.x = m_cube1[0];
-        marker.pose.position.y = m_cube1[1];
-        marker.pose.position.z = m_cube1[2];
-        marker.pose.orientation.x = 0.0;
-        marker.pose.orientation.y = 0.0;
-        marker.pose.orientation.z = 0.0;
-        marker.pose.orientation.w = 1.0;
+        std::vector<geometry_msgs::Point> markers_transformed;
+        for (auto &point :m_geom_markers){
+            marker.points.push_back(m_transformer.transformHeaderless(transform_stamped, point).value());
+            //marker.points.push_back(point);
+        }
+
         marker.scale.x = 0.5;
         marker.scale.y = 0.5;
         marker.scale.z = 0.5;
         marker.color.a = 0.4;
-        marker.color.r = 0.0;
         marker.color.g = 1.0;
-        marker.color.b = 0.0;
-        m_pub_cube1.publish(marker);
-        ROS_INFO_THROTTLE(1.0, "[DetectionNode] marker cube sent");
 
-        marker.pose.position.x = m_drill1[0];
-        marker.pose.position.y = m_drill1[1];
-        marker.pose.position.z = m_drill1[2];
-        m_pub_drill1.publish(marker);
-        ROS_INFO_THROTTLE(1.0, "[DetectionNode] marker drill sent");
+        marker_array.markers.push_back(marker);
 
-
-        marker.pose.position.x = m_survivor1[0];
-        marker.pose.position.y = m_survivor1[1];
-        marker.pose.position.z = m_survivor1[2];
-        m_pub_survivor1.publish(marker);
-        ROS_INFO_THROTTLE(1.0, "[DetectionNode] marker survivor 1 sent");
+        m_pub_cube_array.publish(marker_array);
+        ROS_INFO_THROTTLE(1.0, "[DetectionNode] marker cube array sent");
 
     }
 // | -------------------- other functions ------------------- |
 
-    //visualization_msgs::Marker create_marker(std::string shape, std::vector<float> position){
-        
     //}
 }  // namespace artifacts_detection  
 
 /* every nodelet must export its class as nodelet plugin */
-PLUGINLIB_EXPORT_CLASS(artifacts_detection::DetectionNode, nodelet::Nodelet)
+PLUGINLIB_EXPORT_CLASS(artifacts_detection::DetectionNode, nodelet::Nodelet
+)
