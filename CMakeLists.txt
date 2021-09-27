@@ -10,10 +10,15 @@ add_compile_options(-Wall -Wextra -pedantic -Werror -Werror=vla)
 add_compile_options("-DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
+  nav_msgs
   mrs_lib
   tf2_eigen
+  tf2_ros
+  tf2_eigen
   geometry_msgs
+  swarm_gazebo_resources
 )
 
 find_package(OpenCV REQUIRED)

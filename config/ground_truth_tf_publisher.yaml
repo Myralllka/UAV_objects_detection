@@ -1,0 +1,6 @@
+ground_truth:
+  tf_publish_rate: 50
+  ground_truth_frame_id: "world"
+  other_frame_id: "fcu_uav1"
+  local_frame_id: "local_origin_stable"
+
