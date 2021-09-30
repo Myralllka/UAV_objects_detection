@@ -36,10 +36,10 @@ windows:
       layout: tiled
       panes:
         - waitForControl; roslaunch baloon_simulation publish_ground_truth_tf.launch 
-        - waitForControl; roslaunch mrs_byci_skala_detection rviz.launch
+        - waitForControl; roslaunch mrs_detection rviz.launch
         - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
   - easy_control:
       layout: tiled
       panes:
-        - waitForControl; waitForControl; roslaunch mrs_byci_skala_detection detection.launch
+        - waitForControl; waitForControl; roslaunch mrs_detection detection.launch
         - waitForControl; waitForControl; roslaunch mrs_rviz_plugins rviz_interface.launch

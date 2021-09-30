@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1.2)
-project(mrs_byci_skala_detection)
+project(mrs_detection)
 
 set(FILESNAME DetectionNode)
 
