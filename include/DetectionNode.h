@@ -36,7 +36,10 @@ namespace artifacts_detection {
 
         std::string m_uav_name;
 
-        std::vector<float> m_positions;
+        std::vector<float> m_human_positions;
+        std::vector<float> m_human_offset;
+        std::vector<float> m_human_size;
+
         std::vector<geometry_msgs::Point> m_geom_markers;
 
         // | --------------------- MRS transformer -------------------- |

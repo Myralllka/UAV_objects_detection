@@ -24,9 +24,12 @@ namespace artifacts_detection {
         /* (mrs_lib implementation checks whether the parameter was loaded or not) */
         int num_of_obj;
         mrs_lib::ParamLoader pl(nh, "DetectionNode");
+
         pl.loadParam("UAV_NAME", m_uav_name);
-        pl.loadParam("positions", m_positions);
-        pl.loadParam("number", num_of_obj);
+        pl.loadParam("human_walking_positions", m_human_positions);
+        pl.loadParam("number_of_humans", num_of_obj);
+        pl.loadParam("human.offset", m_human_offset);
+        pl.loadParam("human.size", m_human_size);
 
         if (!pl.loadedSuccessfully()) {
             ROS_ERROR("[DetectionNode]: failed to load non-optional parameters!");
@@ -36,9 +39,9 @@ namespace artifacts_detection {
         int counter = 0;
         for(int i = 0; i < num_of_obj; ++i){
             geometry_msgs::Point point_for_reading;
-            point_for_reading.x = m_positions[counter++];
-            point_for_reading.y = m_positions[counter++];
-            point_for_reading.z = m_positions[counter++];
+            point_for_reading.x = m_human_positions[counter++];
+            point_for_reading.y = m_human_positions[counter++];
+            point_for_reading.z = m_human_positions[counter++];
         //    std::cout << point_for_reading << std::endl;
             m_geom_markers.push_back(std::move(point_for_reading));
         }

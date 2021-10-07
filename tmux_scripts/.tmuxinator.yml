@@ -10,7 +10,9 @@ windows:
   - gazebo:
       layout: tiled
       panes:
-        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='$(find swarm_gazebo_resources)/worlds/forest_rumburk_large.world'
+       #        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='$(find swarm_gazebo_resources)/worlds/forest_rumburk_large.world'
+        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='$(find detection_gazebo_resources)/worlds/baylands.world'
+       #        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='/home/mrs/Downloads/baylands.world'
         - waitForOdometry; gz camera -c gzclient_camera -f uav1; history -s gz camera -c gzclient_camera -f uav1
   - status:
       layout: tiled
@@ -19,7 +21,7 @@ windows:
   - spawn:
       layout: tiled
       panes:
-        - waitForSimulation; rosservice call /mrs_drone_spawner/spawn "1 $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-ouster --ouster-model OS1-64 --use-gpu-ray --pos 2.5 -1.5 3.5 0"
+        - waitForSimulation; rosservice call /mrs_drone_spawner/spawn "1 $UAV_TYPE --enable-rangefinder --enable-ground-truth --enable-ouster --ouster-model OS0-128 --use-gpu-ray --pos -65 -286 0.1 0"
   - control:
       layout: tiled
       panes:
