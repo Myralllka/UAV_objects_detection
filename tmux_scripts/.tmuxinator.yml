@@ -11,7 +11,7 @@ windows:
       layout: tiled
       panes:
        #        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='$(find swarm_gazebo_resources)/worlds/forest_rumburk_large.world'
-        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='$(find detection_gazebo_resources)/worlds/baylands.world'
+        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=false world_file:='$(find detection_gazebo_resources)/worlds/baylands.world'
        #        - waitForRos; roslaunch mrs_simulation simulation.launch gui:=true world_file:='/home/mrs/Downloads/baylands.world'
         - waitForOdometry; gz camera -c gzclient_camera -f uav1; history -s gz camera -c gzclient_camera -f uav1
   - status:
@@ -37,7 +37,7 @@ windows:
   - rviz:
       layout: tiled
       panes:
-        - waitForControl; roslaunch baloon_simulation publish_ground_truth_tf.launch 
+        #- waitForControl; roslaunch baloon_simulation publish_ground_truth_tf.launch 
         - waitForControl; roslaunch mrs_detection rviz.launch
         - waitForControl; roslaunch mrs_rviz_plugins load_robot.launch
   - easy_control:

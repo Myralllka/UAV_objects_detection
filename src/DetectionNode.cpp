@@ -24,19 +24,19 @@ namespace artifacts_detection {
         /* (mrs_lib implementation checks whether the parameter was loaded or not) */
         int num_of_obj;
         mrs_lib::ParamLoader pl(nh, "DetectionNode");
-
         pl.loadParam("UAV_NAME", m_uav_name);
         pl.loadParam("human_walking_positions", m_human_positions);
         pl.loadParam("number_of_humans", num_of_obj);
-        pl.loadParam("human.offset", m_human_offset);
-        pl.loadParam("human.size", m_human_size);
+        pl.loadParam("human/size", m_human_size);
+        pl.loadParam("human/offset", m_human_offset);
 
         if (!pl.loadedSuccessfully()) {
             ROS_ERROR("[DetectionNode]: failed to load non-optional parameters!");
             ros::shutdown();
-        }
+        } else {ROS_INFO("[DetectionNode]: loaded non-optional parameters");}
         // As far as 'objects' are as one-dim array, read them carefully
         int counter = 0;
+
         for(int i = 0; i < num_of_obj; ++i){
             geometry_msgs::Point point_for_reading;
             point_for_reading.x = m_human_positions[counter++];
@@ -45,7 +45,7 @@ namespace artifacts_detection {
         //    std::cout << point_for_reading << std::endl;
             m_geom_markers.push_back(std::move(point_for_reading));
         }
-
+        ROS_INFO("[DetectionNode]: readed positions to an array");
 
         m_pub_cube_array = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 1);
 
@@ -68,10 +68,10 @@ namespace artifacts_detection {
     void DetectionNode::tim_markers_publish([[maybe_unused]] const ros::TimerEvent &ev) {
         if (not is_initialized) return;
 
-        const auto tf_subt_ouster = m_transformer.getTransform("subt", "uav22/os_lidar", ros::Time::now());
+        const auto tf_subt_ouster = m_transformer.getTransform("uav1/stable_origin", "uav1/os_lidar", ros::Time::now());
         
         if (not tf_subt_ouster.has_value()) {
-            ROS_INFO_THROTTLE(1.0, "[DetectionNode] No transformation form %s to %s", "subt", "uav22/os_lidar");
+            ROS_INFO_THROTTLE(1.0, "[DetectionNode] No transformation form %s to %s", "subt", "uav1/os_lidar");
             return;
         }
 
@@ -80,7 +80,7 @@ namespace artifacts_detection {
 
         visualization_msgs::Marker marker;
         marker.header.stamp = ros::Time();
-        marker.header.frame_id = "uav22/os_lidar";
+        marker.header.frame_id = "uav1/os_lidar";
         //marker.header.frame_id = "subt";
         marker.ns = "mnspace";
         marker.id = 0;
@@ -92,10 +92,10 @@ namespace artifacts_detection {
             //marker.points.push_back(point);
         }
 
-        marker.scale.x = 0.5;
-        marker.scale.y = 0.5;
-        marker.scale.z = 0.5;
-        marker.color.a = 0.4;
+        marker.scale.x = 1.0;
+        marker.scale.y = 1.0;
+        marker.scale.z = 1.0;
+        marker.color.a = 1.0;
         marker.color.g = 1.0;
 
         marker_array.markers.push_back(marker);
