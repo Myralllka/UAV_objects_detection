@@ -18,7 +18,23 @@
 
 #include <tf2_eigen/tf2_eigen.h>
 
+/* custom messages */
+#include <mrs_detection/Metadata.h>
+#include <mrs_detection/MetadataArray.h>
+
+/* point cloud library */
+#include <pcl_ros/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_representation.h>
+#include <pcl/filters/filter.h>
+#include <pcl/features/normal_3d.h>
+//#include <pcl/registration/icp.h>
+//#include <pcl/registration/icp_nl.h>
+#include <pcl/registration/transforms.h>
+
 //}
+
 
 namespace artifacts_detection {
 
@@ -47,20 +63,26 @@ namespace artifacts_detection {
         mrs_lib::Transformer m_transformer;
 
         // | ---------------------- msg callbacks --------------------- |
+        
+        void m_callb_pc_processing(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &msg);
 
         // | --------------------- timer callbacks -------------------- |
+        
         ros::Timer m_timer_marker;
 
         ros::Timer m_timer_obj_positions;
 
-        void tim_markers_publish([[maybe_unused]] const ros::TimerEvent &ev);
+        [[maybe_unused]] void tim_markers_publish([[maybe_unused]] const ros::TimerEvent &ev);
 
-        void tim_boundbox_write([[maybe_unused]] const ros::TimerEvent &ev);
+        [[maybe_unused]] void tim_boundbox_write([[maybe_unused]] const ros::TimerEvent &ev);
+
         // | --------- variables, related to message checking --------- |
 
         // | ----------------------- publishers ----------------------- |
 
         ros::Publisher m_pub_cube_array;
+
+        ros::Subscriber m_sub_pc;
 
         // | --------------------- other functions -------------------- |
     };

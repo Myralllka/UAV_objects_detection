@@ -33,8 +33,12 @@ namespace artifacts_detection {
         if (!pl.loadedSuccessfully()) {
             ROS_ERROR("[DetectionNode]: failed to load non-optional parameters!");
             ros::shutdown();
-        } else {ROS_INFO("[DetectionNode]: loaded non-optional parameters");}
+        } else {
+            ROS_INFO("[DetectionNode]: loaded non-optional parameters");
+        }
+
         // As far as 'objects' are as one-dim array, read them carefully
+        
         int counter = 0;
 
         for(int i = 0; i < num_of_obj; ++i){
@@ -42,21 +46,21 @@ namespace artifacts_detection {
             point_for_reading.x = m_human_positions[counter++] + m_human_offset[0];
             point_for_reading.y = m_human_positions[counter++] + m_human_offset[1];
             point_for_reading.z = m_human_positions[counter++] + m_human_offset[2];
-        //    std::cout << point_for_reading << std::endl;
-            m_geom_markers.push_back(std::move(point_for_reading));
+            m_geom_markers.push_back(point_for_reading);
         }
         ROS_INFO("[DetectionNode]: readed positions to an array");
 
         m_pub_cube_array = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 1);
-
+        
+        m_sub_pc = nh.subscribe("asfd", 1, &DetectionNode::m_callb_pc_processing, this);
         // | --------------------- tf transformer --------------------- |
 
         m_transformer = mrs_lib::Transformer("DetectionNode");
 
         // | -------------------- initialize timers ------------------- |
 
-        m_timer_marker = nh.createTimer(ros::Duration(0.1), &DetectionNode::tim_markers_publish, this);
-        m_timer_obj_positions = nh.createTimer(ros::Duration(1), &DetectionNode::tim_boundbox_write, this);
+        //m_timer_marker = nh.createTimer(ros::Duration(0.1), &DetectionNode::tim_markers_publish, this);
+        //m_timer_obj_positions = nh.createTimer(ros::Duration(1), &DetectionNode::tim_boundbox_write, this);
 
         ROS_INFO_ONCE("[DetectionNode]: initialized");
         is_initialized = true;
@@ -64,7 +68,10 @@ namespace artifacts_detection {
 //}
 
 // | ---------------------- msg callbacks --------------------- |
-
+    void DetectionNode::m_callb_pc_processing(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &msg) {
+        msg.get();
+        return;
+    }
 // | --------------------- timer callbacks -------------------- |
     void DetectionNode::tim_markers_publish([[maybe_unused]] const ros::TimerEvent &ev) {
         if (not is_initialized) return;
