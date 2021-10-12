@@ -21,9 +21,10 @@
   <depend>cv_bridge</depend>
   <depend>tf2_rosrun</depend>
   <depend>tf2_ros</depend>
-  <depend>swarm_gazebo_resources</depend>
-  <depend>baloon_simulation</depend>
 
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+    
   <export>
     <!-- The plugins.xml file defines nodelet as a plugin -->
     <nodelet plugin="${prefix}/plugins.xml" />

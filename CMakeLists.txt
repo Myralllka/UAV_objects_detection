@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wextra -pedantic -Werror -Werror=vla)
 add_compile_options("-DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 find_package(catkin REQUIRED COMPONENTS
+  message_generation
   roscpp
   rospy
   std_msgs
@@ -21,6 +22,18 @@ find_package(catkin REQUIRED COMPONENTS
   swarm_gazebo_resources
 )
 
+add_message_files(
+  FILES
+  Metadata.msg
+  MetadataArray.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
+
 find_package(OpenCV REQUIRED)
 
 find_package(Eigen3 REQUIRED)
@@ -31,7 +44,7 @@ set(Eigen_LIBRARIES ${Eigen_LIBRARIES})
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES 
-  CATKIN_DEPENDS roscpp mrs_lib 
+  CATKIN_DEPENDS roscpp mrs_lib message_runtime std_msgs
   DEPENDS Eigen
 )
 

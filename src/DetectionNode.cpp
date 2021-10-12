@@ -39,9 +39,9 @@ namespace artifacts_detection {
 
         for(int i = 0; i < num_of_obj; ++i){
             geometry_msgs::Point point_for_reading;
-            point_for_reading.x = m_human_positions[counter++];
-            point_for_reading.y = m_human_positions[counter++];
-            point_for_reading.z = m_human_positions[counter++];
+            point_for_reading.x = m_human_positions[counter++] + m_human_offset[0];
+            point_for_reading.y = m_human_positions[counter++] + m_human_offset[1];
+            point_for_reading.z = m_human_positions[counter++] + m_human_offset[2];
         //    std::cout << point_for_reading << std::endl;
             m_geom_markers.push_back(std::move(point_for_reading));
         }
@@ -56,6 +56,7 @@ namespace artifacts_detection {
         // | -------------------- initialize timers ------------------- |
 
         m_timer_marker = nh.createTimer(ros::Duration(0.1), &DetectionNode::tim_markers_publish, this);
+        m_timer_obj_positions = nh.createTimer(ros::Duration(1), &DetectionNode::tim_boundbox_write, this);
 
         ROS_INFO_ONCE("[DetectionNode]: initialized");
         is_initialized = true;
@@ -94,14 +95,37 @@ namespace artifacts_detection {
 
         marker.scale.x = 1.0;
         marker.scale.y = 1.0;
-        marker.scale.z = 1.0;
-        marker.color.a = 1.0;
+        marker.scale.z = 3.0;
+        marker.color.a = 0.3;
         marker.color.g = 1.0;
 
         marker_array.markers.push_back(marker);
 
         m_pub_cube_array.publish(marker_array);
         ROS_INFO_THROTTLE(1.0, "[DetectionNode] marker cube array sent");
+
+    }
+
+
+    void DetectionNode::tim_boundbox_write([[maybe_unused]] const ros::TimerEvent &ev) {
+        if (not is_initialized) return;
+
+        const auto tf_subt_ouster = m_transformer.getTransform("uav1/stable_origin", "uav1/os_lidar", ros::Time::now());
+        
+        if (not tf_subt_ouster.has_value()) {
+            ROS_INFO_THROTTLE(1.0, "[DetectionNode] No transformation form %s to %s", "subt", "uav1/os_lidar");
+            return;
+        }
+
+        const auto transform_stamped = tf_subt_ouster.value();
+        std::vector<geometry_msgs::Point> points;
+        for (auto &point :m_geom_markers){
+            points.push_back(m_transformer.transformHeaderless(transform_stamped, point).value());
+            //marker.points.push_back(point);
+        }
+        for (auto &p: points) {
+            std::cout << "[DetectionNode] human center: " << p << std::endl;  
+        }
 
     }
 // | -------------------- other functions ------------------- |

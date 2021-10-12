@@ -51,7 +51,11 @@ namespace artifacts_detection {
         // | --------------------- timer callbacks -------------------- |
         ros::Timer m_timer_marker;
 
+        ros::Timer m_timer_obj_positions;
+
         void tim_markers_publish([[maybe_unused]] const ros::TimerEvent &ev);
+
+        void tim_boundbox_write([[maybe_unused]] const ros::TimerEvent &ev);
         // | --------- variables, related to message checking --------- |
 
         // | ----------------------- publishers ----------------------- |
