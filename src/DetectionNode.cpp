@@ -51,7 +51,8 @@ namespace artifacts_detection {
         ROS_INFO("[DetectionNode]: readed positions to an array");
 
         m_pub_cube_array = nh.advertise<visualization_msgs::MarkerArray>("visualization_marker", 1);
-        
+        m_pub_pc_with_metadata = nh.advertise<mrs_detection::MetadataArray>("pc_cloud_metadata", 1);
+
         m_sub_pc = nh.subscribe("asfd", 1, &DetectionNode::m_callb_pc_processing, this);
         // | --------------------- tf transformer --------------------- |
 
@@ -69,7 +70,9 @@ namespace artifacts_detection {
 
 // | ---------------------- msg callbacks --------------------- |
     void DetectionNode::m_callb_pc_processing(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &msg) {
-        msg.get();
+        msg.get(); // pc
+        auto metadata_message = boost::make_shared<mrs_detection::MetadataArray>();
+//        for (size_t i = m_)
         return;
     }
 // | --------------------- timer callbacks -------------------- |

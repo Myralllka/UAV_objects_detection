@@ -82,6 +82,8 @@ namespace artifacts_detection {
 
         ros::Publisher m_pub_cube_array;
 
+        ros::Publisher m_pub_pc_with_metadata;
+
         ros::Subscriber m_sub_pc;
 
         // | --------------------- other functions -------------------- |
