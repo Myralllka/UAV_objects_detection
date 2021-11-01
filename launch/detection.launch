@@ -32,6 +32,8 @@
       <param name="gui" type="bool" value="$(arg gui)"/>
 
       <param name="UAV_NAME" type="string" value="$(arg UAV_NAME)"/>
+      <param name="WORLD_FRAME" type="string" value="$(arg UAV_NAME)/stable_origin"/>
+      <param name="LIDAR_FRAME" type="string" value="$(arg UAV_NAME)/os_lidar"/>
 
       <!-- ROS parameters config file -->
       <rosparam file="$(find mrs_detection)/config/objects.yml" />

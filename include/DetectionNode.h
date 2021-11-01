@@ -9,6 +9,9 @@
 /* some STL includes */
 #include <cstdlib>
 #include <cstdio>
+#include <algorithm>
+#include <pluginlib/class_list_macros.h>
+
 
 /* custom helper functions from our library */
 #include <mrs_lib/param_loader.h>
@@ -19,6 +22,7 @@
 #include <tf2_eigen/tf2_eigen.h>
 
 /* custom messages */
+
 #include <mrs_detection/Metadata.h>
 #include <mrs_detection/MetadataArray.h>
 
@@ -51,6 +55,8 @@ namespace artifacts_detection {
         /* ros parameters */
 
         std::string m_uav_name;
+        std::string m_world_frame;
+        std::string m_lidar_frame;
 
         std::vector<float> m_human_positions;
         std::vector<float> m_human_offset;
@@ -63,8 +69,10 @@ namespace artifacts_detection {
         mrs_lib::Transformer m_transformer;
 
         // | ---------------------- msg callbacks --------------------- |
-        
-        void m_callb_pc_processing(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &msg);
+
+        void m_callb_pc_metadata_publish(const sensor_msgs::PointCloud2::ConstPtr &msg);
+
+        void m_callb_pc_publish(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
         // | --------------------- timer callbacks -------------------- |
         
@@ -83,6 +91,8 @@ namespace artifacts_detection {
         ros::Publisher m_pub_cube_array;
 
         ros::Publisher m_pub_pc_with_metadata;
+
+        ros::Publisher m_pub_pc_transformed;
 
         ros::Subscriber m_sub_pc;
 
