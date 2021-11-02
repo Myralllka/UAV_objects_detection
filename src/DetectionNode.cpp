@@ -62,7 +62,7 @@ namespace artifacts_detection {
 
         // | -------------------- initialize timers ------------------- |
 
-        //m_timer_marker = nh.createTimer(ros::Duration(0.1), &DetectionNode::tim_markers_publish, this);
+        m_timer_marker = nh.createTimer(ros::Duration(0.1), &DetectionNode::tim_markers_publish, this);
         //m_timer_obj_positions = nh.createTimer(ros::Duration(1), &DetectionNode::tim_boundbox_write, this);
 
         ROS_INFO_ONCE("[DetectionNode]: initialized");
@@ -93,7 +93,7 @@ namespace artifacts_detection {
 
     }
 
-    void DetectionNode::m_callb_pc_publish(const sensor_msgs::PointCloud2::ConstPtr &msg) {
+    void DetectionNode::m_callb_pc_publish(const pcl::PointCloud<pcl::PointXYZ>::ConstPtr &msg) {
         if (not is_initialized) return;
         const auto tf_subt_ouster = m_transformer.getTransform(m_lidar_frame, m_world_frame, ros::Time::now());
 
@@ -103,12 +103,13 @@ namespace artifacts_detection {
                               m_world_frame.c_str());
             return;
         }
-        auto transform_result = m_transformer.transform(tf_subt_ouster.value(), msg);
-        if (transform_result.has_value()) {
-            m_pub_pc_transformed.publish(transform_result.value());
-            ROS_INFO_THROTTLE(1.0, "[DetectionNode] transformed pc published");
-            return;
-        }
+        const auto transformation_mat = tf_subt_ouster->getTransformEigen();
+//        auto transform_result = m_transformer.transform(tf_subt_ouster.value(), msg);
+//        if (transform_result.has_value()) {
+//            m_pub_pc_transformed.publish(transform_result.value());
+//            ROS_INFO_THROTTLE(1.0, "[DetectionNode] transformed pc published");
+//            return;
+//        }
         ROS_ERROR_THROTTLE(1.0,
                            "[DetectionNode] unsuccessful transformation of pointcloud from \"%s\" to \"%s\"",
                            m_lidar_frame.c_str(),
@@ -123,8 +124,7 @@ namespace artifacts_detection {
 
         visualization_msgs::Marker marker;
         marker.header.stamp = ros::Time();
-        marker.header.frame_id = "uav1/os_lidar";
-        //marker.header.frame_id = "subt";
+        marker.header.frame_id = m_world_frame;
         marker.ns = "mnspace";
         marker.id = 0;
         marker.type = visualization_msgs::Marker::CUBE_LIST;
@@ -148,7 +148,8 @@ namespace artifacts_detection {
     void DetectionNode::tim_boundbox_write([[maybe_unused]] const ros::TimerEvent &ev) {
         if (not is_initialized) return;
 
-        const auto tf_subt_ouster = m_transformer.getTransform("uav1/stable_origin", "uav1/os_lidar", ros::Time::now());
+        const auto tf_subt_ouster = m_transformer.getTransform("uav1/stable_origin", "uav1/os_lidar",
+                                                               ros::Time::now());
 
         if (not tf_subt_ouster.has_value()) {
             ROS_INFO_THROTTLE(1.0, "[DetectionNode] No transformation form %s to %s", "subt", "uav1/os_lidar");
@@ -168,7 +169,7 @@ namespace artifacts_detection {
 // | -------------------- other functions ------------------- |
 
     //}
-}  // namespace artifacts_detection  
+}  // namespace artifacts_detection
 
 /* every nodelet must export its class as nodelet plugin */
 PLUGINLIB_EXPORT_CLASS(artifacts_detection::DetectionNode, nodelet::Nodelet)
